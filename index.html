@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETF Factsheet — 패시브 ETF, 한눈에 비교 (KR/US 상장)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@latest/dist/web/static/pretendard.css" />
+<style>
+  :root{
+    --bg: #faf9f5;
+    --panel: #ffffff;
+    --panel-2: #f4f2ea;
+    --line: #d9d5c9;
+    --ink: #1c1c19;
+    --muted: #6d6a60;
+    --kr: #7a2230;
+    --us: #1f3a5c;
+    --good: #2f6b4f;
+    --bad: #8a3324;
+    --stamp: #7a2230;
+    --radius: 4px;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --serif: 'Pretendard', -apple-system, BlinkMacSystemFont, ui-sans-serif, sans-serif;
+    --body: 'Pretendard', -apple-system, BlinkMacSystemFont, ui-sans-serif, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink); font-family:var(--body);
+    -webkit-font-smoothing:antialiased; min-height:100vh;
+  }
+  a{color:inherit}
+
+  /* ---------- masthead ---------- */
+  header.mast{ border-bottom:2px solid var(--ink); background:var(--bg); position:sticky; top:0; z-index:40; }
+  .mast-inner{ max-width:1080px; margin:0 auto; padding:24px 24px 0; }
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:.14em; color:var(--muted);
+    display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom:10px;
+    flex-wrap:wrap; gap:6px;
+  }
+  .update-tag{
+    letter-spacing:normal; display:flex; align-items:center; gap:6px; color:var(--muted); font-size:11px;
+  }
+  .update-tag b{ color:var(--ink); font-weight:600; }
+  .update-dot{ width:6px; height:6px; border-radius:50%; background:var(--good); display:inline-block; }
+  h1{
+    font-family:var(--serif); font-weight:600; font-size:32px; letter-spacing:-.01em; margin:14px 0 4px;
+  }
+  .dek{ font-size:14px; color:var(--muted); margin:0 0 18px; max-width:640px; line-height:1.5; }
+
+  /* market section blocks */
+  .market-block{ max-width:1080px; margin:0 auto; padding:0 24px; }
+  .market-block + .market-block{ border-top:1px solid var(--line); }
+  .market-head{
+    display:flex; align-items:baseline; gap:10px; margin:40px 0 6px;
+  }
+  .market-block:first-child .market-head{ margin-top:28px; }
+  .market-head h2{ font-family:var(--serif); font-size:24px; font-weight:600; margin:0; }
+  .market-head .market-tag{ font-family:var(--mono); font-size:11px; color:var(--muted); }
+  .market-head.kr h2{ color:var(--kr); }
+  .market-head.us h2{ color:var(--us); }
+
+  /* index filter row */
+  .filters{
+    display:flex; align-items:center; gap:18px; flex-wrap:wrap; padding:8px 0 14px;
+    font-family:var(--serif); font-size:16px; color:var(--muted);
+  }
+  .filters .lbl{ letter-spacing:.06em; }
+  .filters button{
+    font-family:var(--serif); font-size:16px; font-weight:600; background:none; border:none; color:var(--muted);
+    cursor:pointer; padding:3px 0; border-bottom:2px solid transparent;
+  }
+  .filters button.active{ color:var(--ink); border-bottom:2px solid var(--ink); }
+  .filters .sep{ color:var(--line); font-size:16px; }
+
+  .fx-line{
+    display:none; font-family:var(--mono); font-size:11.5px; color:var(--us); padding:0 0 10px;
+  }
+  .fx-line.show{ display:block; }
+  .fx-line span{ color:var(--muted); }
+
+  /* ---------- main table ---------- */
+  main{ padding-bottom:20px; }
+  table.sheet{ width:100%; border-collapse:collapse; }
+  .sheet thead th{
+    text-align:left; font-family:var(--mono); font-size:12.5px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:.05em; padding:12px 8px; border-bottom:1px solid var(--ink); font-weight:600;
+  }
+  .sheet thead th.num{ text-align:right; }
+  .sheet tbody tr.row{ cursor:pointer; }
+  .sheet tbody tr.row td{ padding:14px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  .sheet tbody tr.row:hover td{ background:var(--panel-2); }
+  .num{ font-family:var(--mono); font-variant-numeric:tabular-nums; text-align:right; font-size:13px; }
+  .idxno{ font-family:var(--mono); color:var(--muted); font-size:12px; width:28px; }
+  .fname{ font-family:var(--serif); font-weight:600; font-size:15.5px; }
+  .fname.ticker-lead{ font-family:var(--mono); font-weight:700; font-size:17px; letter-spacing:.03em; }
+  .fname .lev{ font-family:var(--mono); font-size:9.5px; color:var(--bad); border:1px solid var(--bad); border-radius:3px; padding:1px 4px; margin-left:5px; font-weight:600;}
+  .fname .stamp{ margin-left:5px; vertical-align:1px; }
+  .div-line{
+    font-family:var(--mono); font-size:12.5px; color:var(--ink); margin-top:5px;
+    padding-top:5px; border-top:1px dashed var(--line); display:flex; align-items:center; gap:6px; justify-content:flex-end;
+  }
+  .div-line .div-yield{ font-weight:700; color:var(--good); font-size:13.5px; }
+  .div-line .div-freq{ color:var(--muted); }
+  .stamp.div{ border-color:var(--good); color:var(--good); transform:rotate(-3deg); }
+  .ticker{ font-family:var(--mono); font-size:11.5px; color:var(--muted); display:block; margin-top:2px; }
+  .issuer{ font-size:12.5px; color:var(--muted); }
+  .fee-cell{ position:relative; }
+  .fee-num{ font-weight:600; }
+  .stamp{
+    display:inline-block; font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:.02em;
+    padding:2px 6px; border:1.3px solid var(--stamp); color:var(--stamp); border-radius:3px;
+    transform:rotate(-4deg); white-space:nowrap;
+  }
+  .stamp.vol{ border-color:var(--us); color:var(--us); transform:rotate(3deg); }
+  .chev{ text-align:right; color:var(--muted); font-size:11px; width:16px; }
+
+  /* detail row */
+  tr.detail-row td{ padding:0 8px 22px; border-bottom:1px solid var(--line); background:var(--panel-2); }
+  tr.detail-row.closed{ display:none; }
+  .detail-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:14px 0 16px; padding-top:14px; border-top:1px dashed var(--line); }
+  .stat-label{ font-family:var(--mono); font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em;}
+  .stat-value{ font-family:var(--mono); font-size:13.5px; margin-top:3px; }
+  .pc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+  .pc-box{ border-left:2px solid var(--line); padding-left:12px; }
+  .pc-box.pro{ border-color:var(--good); }
+  .pc-box.con{ border-color:var(--bad); }
+  .pc-box h4{ font-family:var(--serif); font-size:13px; margin:0 0 7px; font-weight:600; }
+  .pc-box.pro h4{ color:var(--good); }
+  .pc-box.con h4{ color:var(--bad); }
+  .pc-box ul{ margin:0; padding-left:16px; font-size:13px; line-height:1.6; color:#33322c; }
+  .site-link{
+    display:inline-block; margin-top:16px; font-family:var(--mono); font-size:12px; color:var(--us);
+    border-bottom:1px solid var(--us); padding-bottom:1px; text-decoration:none;
+  }
+  .site-link:hover{ opacity:.7; }
+
+  .empty{ padding:60px 10px; text-align:center; color:var(--muted); font-family:var(--mono); font-size:13px; }
+
+  footer{
+    max-width:1080px; margin:10px auto 0; padding:20px 24px 60px; color:var(--muted); font-size:11.5px;
+    font-family:var(--mono); border-top:1px solid var(--line); line-height:1.7;
+  }
+
+  @media (max-width:720px){
+    h1{ font-size:26px; }
+    .sheet thead{ display:none; }
+    .sheet tbody tr.row{ display:block; padding:14px 0; border-bottom:1px solid var(--line); }
+    .sheet tbody tr.row td{ display:block; border:none; padding:2px 0; }
+    .num{ text-align:left; }
+    .div-line{ justify-content:flex-start; }
+    .detail-grid{ grid-template-columns:1fr 1fr; }
+    .pc-grid{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="mast-inner">
+    <div class="eyebrow">
+      <span>INDEX FACT SHEET · KR / US LISTED</span>
+      <span class="update-tag"><span class="update-dot"></span>마지막 업데이트 <b id="dateStamp">2026.07.11</b> · 일 1회 갱신</span>
+    </div>
+    <h1>패시브 ETF, 한눈에 비교</h1>
+    <p class="dek">같은 지수를 그대로 추종하는 패시브 ETF를, 한국 상장과 미국 상장으로 나란히 비교합니다. 총보수·상장일·장단점을 근거로 골라보세요.</p>
+  </div>
+</header>
+
+<main id="sections">
+  <div class="market-block" data-market="kr">
+    <div class="market-head kr"><h2>국내 상장</h2><span class="market-tag">KRX</span></div>
+    <div class="filters" data-chips-for="kr"></div>
+    <table class="sheet">
+      <thead>
+        <tr>
+          <th></th><th>종목명 / 운용사</th><th class="num">총보수</th><th class="num">상장일</th><th class="num">현재가</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="rows-kr"></tbody>
+    </table>
+  </div>
+
+  <div class="market-block" data-market="us">
+    <div class="market-head us"><h2>미국 상장</h2><span class="market-tag">NYSE · NASDAQ</span></div>
+    <div id="fxBanner" class="fx-line show">참고환율 <b id="fxRate">1 USD ≈ 1,500원</b> <span>— 미국 상장 ETF 가격을 원화로 가늠할 때 참고용, 매매 기준환율과 다를 수 있음</span></div>
+    <div class="filters" data-chips-for="us"></div>
+    <table class="sheet">
+      <thead>
+        <tr>
+          <th></th><th>종목명 / 운용사</th><th class="num">총보수</th><th class="num">상장일</th><th class="num">현재가</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="rows-us"></tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+// ============ 샘플 데이터 (디자인 확인용, 추후 종목 추가 예정) ============
+const FUNDS = [
+  {
+    market:'kr', idx:'sp500', ticker:'360750', isin:'KR7360750004', name:'TIGER 미국S&P500', issuer:'미래에셋자산운용',
+    url:'https://investments.miraeasset.com/tigeretf/ko/product/search/detail/index.do?ksdFund=KR7360750004',
+    fee:0.097, listed:'2020-08-07', price:'28,555원', aum:'199,941억원',
+    divFreq:'분기', divYield:'0.86%',
+    pros:['국내 S&P500 ETF 중 순자산 최대(19.5조원), 유동성 압도적','ISA·연금저축·IRP 계좌에서 매매 가능, 원화로 환전 없이 투자'],
+    cons:['환노출형이라 원/달러 환율 변동이 수익률에 그대로 반영됨','미국 상장 ETF 대비 총보수가 조금 더 높음']
+  },
+  {
+    market:'kr', idx:'sp500', ticker:'360200', isin:'KR7360200000', name:'ACE 미국S&P500', issuer:'한국투자신탁운용',
+    url:'https://www.aceetf.co.kr/fund/K55101D78195',
+    fee:0.093, listed:'2020-08-07', price:'28,425원', aum:'40,819억원',
+    divFreq:'분기', divYield:'1.00%',
+    pros:['TIGER와 함께 국내 최초로 상장된 S&P500 ETF, 트랙레코드 5년+','실부담비용이 업계 최저 수준'],
+    cons:['TIGER 대비 거래대금이 적어 큰 금액 매매 시 슬리피지 유의','분배 방식·리밸런싱 시점이 운용사마다 미세하게 다름']
+  },
+  {
+    market:'kr', idx:'sp500', ticker:'379800', isin:'KR7379800006', name:'KODEX 미국S&P500', issuer:'삼성자산운용',
+    url:'https://www.samsungfund.com/etf/product/view.do?id=2ETFE4',
+    fee:0.104, listed:'2021-04-09', price:'25,595원', aum:'100,091억원',
+    divFreq:'분기', divYield:'1.74%',
+    pros:['삼성자산운용 브랜드 — 국내 ETF 순자산 1위 운용사의 안정적 운용','같은 그룹 내 배당수익률이 가장 높은 편(분기 약 1.7%대)'],
+    cons:['TIGER·ACE·RISE 대비 총보수가 다소 높은 편(0.104%)','과거 TR(총수익) 구조였다가 세법 개정으로 일반형(PR)으로 전환된 이력']
+  },
+  {
+    market:'kr', idx:'sp500', ticker:'379780', isin:'KR7379780000', name:'RISE 미국S&P500', issuer:'KB자산운용',
+    url:'https://riseetf.co.kr/prod/finderDetail/44B3',
+    fee:0.093, listed:'2021-04-07', price:'24,726원', aum:'15,568억원',
+    divFreq:'분기', divYield:'1.20%',
+    pros:['국내 S&P500 ETF 중 최저 수준 총보수(0.093%)로 장기 적립식에 유리','KB자산운용의 저보수 전략 라인업, 나스닥100 자매 상품과 세트로 활용 가능'],
+    cons:['TIGER·KODEX 대비 거래대금이 작아 큰 금액 매매 시 스프레드 유의','순자산 규모(약 1.6조원)도 상대적으로 작은 편']
+  },
+  {
+    market:'kr', idx:'ndx100', ticker:'133690', isin:'KR7133690008', name:'TIGER 미국나스닥100', issuer:'미래에셋자산운용',
+    url:'https://investments.miraeasset.com/tigeretf/ko/product/search/detail/index.do?ksdFund=KR7133690008',
+    fee:0.141, listed:'2010-10-18', price:'112,340원', aum:'114,477억원',
+    divFreq:'분기', divYield:'0.55%',
+    pros:['국내 최초·최장수 나스닥100 ETF(2010년 상장), 검증된 트랙레코드','국내 나스닥100 ETF 중 거래대금 최대로 유동성 우수'],
+    cons:['기술주 쏠림으로 S&P500 대비 변동성이 큼','상대적으로 총보수가 최저가 그룹보다는 높은 편']
+  },
+  {
+    market:'kr', idx:'ndx100', ticker:'379810', isin:'KR7379810005', name:'KODEX 미국나스닥100', issuer:'삼성자산운용',
+    url:'https://www.samsungfund.com/etf/product/view.do?id=2ETFE3',
+    fee:0.156, listed:'2021-04-09', price:'29,180원', aum:'88,772억원',
+    divFreq:'분기', divYield:'0.87%',
+    pros:['삼성자산운용 브랜드, 국내 ETF 순자산 1위 운용사의 안정성','분기 분배금 지급으로 현금흐름 관리 용이'],
+    cons:['TIGER 대비 총보수가 다소 높음','2021년 상장으로 TIGER보다 트랙레코드가 짧음']
+  },
+  {
+    market:'kr', idx:'ndx100', ticker:'367380', isin:'KR7367380003', name:'ACE 미국나스닥100', issuer:'한국투자신탁운용',
+    url:'https://www.aceetf.co.kr/fund/K55101DB1182',
+    fee:0.133, listed:'2020-10-29', price:'34,040원', aum:'36,289억원',
+    divFreq:'분기', divYield:'0.54%',
+    pros:['2020년 10월 상장으로 TIGER 다음으로 트랙레코드가 긴 나스닥100 ETF','순자산 1조원을 돌파한 검증된 상품, 낮은 총보수(0.133%)'],
+    cons:['TIGER 대비 거래대금·유동성이 낮음','RISE보다는 총보수가 약간 높음']
+  },
+  {
+    market:'kr', idx:'ndx100', ticker:'368590', isin:'KR7368590006', name:'RISE 미국나스닥100', issuer:'KB자산운용',
+    url:'https://riseetf.co.kr/prod/finderDetail/44A9',
+    fee:0.129, listed:'2020-11-06', price:'34,140원', aum:'16,678억원',
+    divFreq:'분기', divYield:'0.62%',
+    pros:['국내 나스닥100 ETF 중 최저 수준 총보수(0.129%)','KB자산운용의 저보수 전략, 2020년 상장으로 트랙레코드 5년+'],
+    cons:['TIGER·KODEX 대비 거래대금이 작아 유동성이 낮은 편','순자산(약 1.7조원)도 대형 3사 대비 작은 편']
+  },
+  {
+    market:'kr', idx:'ndx100', ticker:'476030', isin:'KR7476030002', name:'SOL 미국나스닥100', issuer:'신한자산운용',
+    fee:0.208, listed:'2024-03-12', price:'19,100원', aum:'1,174억원',
+    divFreq:'분기', divYield:'0.52%',
+    pros:['신한자산운용의 나스닥100 라인업, 2024년 상장으로 비교적 최근 출시','대형사 대비 총보수 경쟁력을 내세운 후발주자'],
+    cons:['2024년 상장으로 트랙레코드가 짧음','거래대금이 작아(일 15억원 수준) 큰 금액 매매 시 유동성 유의']
+  },
+  {
+    market:'kr', idx:'ndx100', ticker:'0069M0', isin:'KR70069M0006', name:'1Q 미국나스닥100', issuer:'하나자산운용',
+    fee:0.357, listed:'2025-06-24', price:'14,710원', aum:'1,966억원',
+    divFreq:'분기', divYield:'0.45%',
+    pros:['기본 운용보수 연 0.0055%로 전 세계 나스닥100 ETF 중 최저 수준을 표방','주당 가격이 낮아(1만원대) 소액 적립식 투자에 유리'],
+    cons:['2025년 상장으로 트랙레코드가 매우 짧음','아직 순자산·거래대금이 작아 유동성이 낮은 편']
+  },
+  {
+    market:'us', idx:'sp500', ticker:'SPY', name:'SPDR S&P 500 ETF Trust', issuer:'State Street',
+    fee:0.0945, listed:'1993-01-22', price:'$754.95', aum:'$789.2B',
+    divFreq:'분기', divYield:'1.02%',
+    pros:['1993년 상장된 세계 최초의 ETF, S&P500 ETF 중 거래대금·옵션시장 유동성 압도적 1위','기관·단기 트레이더가 가장 많이 쓰는 상품이라 스프레드가 가장 좁음'],
+    cons:['UIT(유닛투자신탁) 구조라 배당 재투자·증권대여가 안 돼 VOO·IVV 대비 총보수가 높음(0.0945%)','장기 적립식 투자자에게는 저보수 대안(VOO·IVV)이 더 유리할 수 있음']
+  },
+  {
+    market:'us', idx:'sp500', ticker:'VOO', name:'Vanguard S&P 500 ETF', issuer:'Vanguard',
+    fee:0.03, listed:'2010-09-07', price:'$636.35', aum:'$986.2B',
+    divFreq:'분기', divYield:'1.14%',
+    pros:['업계 최저 수준 보수(0.03%), 뱅가드 특유의 무배당 구조·저비용 철학','순자산 1.5조 달러 이상으로 세계 최대 S&P500 ETF'],
+    cons:['달러로만 거래되어 환전 필요, 환율 변동에 그대로 노출','미국 정규장 시간(한국시간 밤~새벽)에만 실시간 매매 가능']
+  },
+  {
+    market:'us', idx:'sp500', ticker:'IVV', name:'iShares Core S&P 500 ETF', issuer:'BlackRock',
+    fee:0.03, listed:'2000-05-15', price:'$758.11', aum:'$894.4B',
+    divFreq:'분기', divYield:'1.16%',
+    pros:['2000년 상장으로 SPY 다음으로 오래된 S&P500 ETF','VOO와 보수 동일(0.03%), 세제·유동성 측면에서 대체 가능'],
+    cons:['SPY 대비 옵션시장 유동성은 상대적으로 낮음','국내 계좌에서는 해외주식 양도소득세(22%) 대상']
+  },
+  {
+    market:'us', idx:'ndx100', ticker:'QQQ', name:'Invesco QQQ Trust', issuer:'Invesco',
+    fee:0.18, listed:'1999-03-10', price:'$725.51', aum:'$481.1B',
+    divFreq:'분기', divYield:'0.48%',
+    pros:['나스닥100 ETF 중 순자산·거래량·옵션시장 유동성 압도적 1위','2025년 12월 신탁구조 전환으로 보수 0.20%→0.18%로 인하'],
+    cons:['QQQM 대비 여전히 보수가 높음(0.18% vs 0.15%)','기술주 집중으로 개별 섹터 리스크에 취약']
+  },
+  {
+    market:'us', idx:'ndx100', ticker:'QQQM', name:'Invesco NASDAQ 100 ETF', issuer:'Invesco',
+    fee:0.15, listed:'2020-10-13', price:'$298.72', aum:'$100.6B',
+    divFreq:'분기', divYield:'0.53%',
+    pros:['QQQ와 동일 지수를 추종하면서 보수는 더 낮음(0.15%)','장기 적립식 투자자를 위해 설계된 저가 주당가격 구조'],
+    cons:['QQQ보다 상장이 늦어 옵션시장·기관 유동성은 상대적으로 얕음','단기 트레이더에게는 QQQ가 스프레드 면에서 더 유리']
+  },
+  {
+    market:'kr', idx:'kospi', ticker:'069500', isin:'KR7069500007', name:'KODEX 200', issuer:'삼성자산운용',
+    fee:0.15, listed:'2002-10-14', price:'41,250원', aum:'324,598억원',
+    divFreq:'분기', divYield:'0.64%',
+    pros:['국내 최초·최장수 ETF(2002년 상장), 코스피200 추종 대표 상품','순자산·거래대금 모두 국내 최상위권으로 유동성 최고'],
+    cons:['국내 증시 자체의 낮은 장기 수익률·높은 변동성 감수 필요','반도체 등 특정 업종 쏠림이 커 분산 효과가 제한적']
+  },
+  {
+    market:'us', idx:'leverage', ticker:'QLD', name:'ProShares Ultra QQQ', issuer:'ProShares',
+    fee:0.95, listed:'2006-06-19', price:'$93.70', aum:'$14.2B', leverage:'2X',
+    divFreq:'비정기', divYield:'0.10%',
+    pros:['나스닥100 일일 수익률의 2배를 추종, TQQQ보다 낙폭이 상대적으로 완만함','거의 20년의 트랙레코드로 레버리지 ETF 중에서는 검증된 편'],
+    cons:['일일 리밸런싱 구조라 장기 보유 시 지수의 단순 2배와 괴리가 커질 수 있음(변동성 손실)','총보수 0.95%로 QQQ(0.18%) 대비 훨씬 비쌈, 단기·전술적 매매에 적합']
+  },
+  {
+    market:'us', idx:'leverage', ticker:'TQQQ', name:'ProShares UltraPro QQQ', issuer:'ProShares',
+    url:'https://www.proshares.com/our-etfs/leveraged-and-inverse/tqqq',
+    fee:0.84, listed:'2010-02-09', price:'$77.03', aum:'$37.0B', leverage:'3X',
+    divFreq:'비정기', divYield:'0.30%',
+    pros:['나스닥100 일일 수익률의 3배를 추종, 상승장에서 폭발적인 수익률 가능','세계에서 가장 큰 레버리지 ETF로 유동성·거래량이 압도적'],
+    cons:['하락장에서는 손실도 3배로 확대되며 5년 기준 최대낙폭이 80%를 넘긴 이력이 있음','변동성 손실(decay)이 커서 장기·매수 후 보유 전략에는 구조적으로 부적합']
+  },
+];
+
+// 마지막 데이터 갱신일 — data.json 로드 실패 시 쓰이는 fallback 값
+const LAST_UPDATED_FALLBACK = '2026-07-11';
+document.getElementById('dateStamp').textContent = LAST_UPDATED_FALLBACK.replaceAll('-', '.');
+
+// data.json(funetf.co.kr에서 매일 긁어온 가격·거래량)을 FUNDS에 병합
+async function loadLiveData(){
+  try{
+    const res = await fetch('./data.json', { cache: 'no-store' });
+    if(!res.ok) throw new Error('data.json fetch failed: ' + res.status);
+    const data = await res.json();
+    if(data.updated){
+      document.getElementById('dateStamp').textContent = data.updated.replaceAll('-', '.');
+    }
+    if(data.usdKrw){
+      document.getElementById('fxRate').textContent = `1 USD ≈ ${Math.round(data.usdKrw).toLocaleString()}원`;
+    }
+    const fundsData = data.funds || {};
+    FUNDS.forEach(f=>{
+      const key = fundsData[f.isin] ? f.isin : (fundsData[f.ticker] ? f.ticker : null);
+      if(key){
+        const live = fundsData[key];
+        if(live.price) f.price = live.price;
+        if(live.aum) f.aum = live.aum;
+      }
+    });
+  }catch(e){
+    console.warn('실시간 데이터(data.json) 로드 실패, 내장된 스냅샷 값을 사용합니다:', e);
+  }
+}
+
+const IDX_LABEL = { sp500:'S&P 500', ndx100:'나스닥 100', kospi:'코스피', leverage:'나스닥100 레버리지' };
+const MARKET_LABEL = { kr:'KR', us:'US' };
+
+// 순자산 문자열을 비교 가능한 숫자로 변환. 원화("2조 7,498억원")는 억원 단위, 달러("$3.9B")는 달러 단위. 데이터 없으면 null.
+function parseAumToEok(str){
+  if(!str || str.trim()==='-') return null;
+  str = str.trim();
+  if(str.startsWith('$')){
+    const m = str.match(/\$([\d.]+)\s*([BMK])?/i);
+    if(!m) return null;
+    let num = parseFloat(m[1]);
+    const suf = (m[2]||'').toUpperCase();
+    if(suf==='B') num *= 1e9;
+    else if(suf==='M') num *= 1e6;
+    else if(suf==='K') num *= 1e3;
+    return num;
+  }
+  let total = 0, matched = false;
+  const jo = str.match(/([\d,]+)\s*조/);
+  const eok = str.match(/([\d,]+)\s*억/);
+  if(jo){ total += parseFloat(jo[1].replace(/,/g,'')) * 10000; matched = true; }
+  if(eok){ total += parseFloat(eok[1].replace(/,/g,'')); matched = true; }
+  return matched ? total : null;
+}
+
+// 같은 시장(KR/US) × 같은 추종지수 그룹 안에서만 비교해 배지를 매김
+function computeBadges(){
+  const groups = {};
+  FUNDS.forEach(f=>{
+    const key = f.market+'|'+f.idx;
+    (groups[key] = groups[key] || []).push(f);
+  });
+  Object.values(groups).forEach(list=>{
+    if(list.length > 1){
+      const minFee = Math.min(...list.map(f=>f.fee));
+      list.forEach(f=> f._isBestFee = (f.fee === minFee));
+    }
+    const withAum = list.map(f=>({f, v:parseAumToEok(f.aum)})).filter(x=>x.v!==null);
+    if(withAum.length > 1){
+      const maxAum = Math.max(...withAum.map(x=>x.v));
+      withAum.forEach(x=>{ if(x.v === maxAum) x.f._isTopAum = true; });
+    }
+    if(list.length > 1){
+      const maxDiv = Math.max(...list.map(f=>parseFloat(f.divYield)));
+      list.forEach(f=>{ if(parseFloat(f.divYield) === maxDiv) f._isTopDiv = true; });
+    }
+  });
+}
+
+function fmtFee(f){ return f.toFixed(3).replace(/0$/,'').replace(/\.$/,'') + '%'; }
+
+// 시장별로 표시 가능한 카테고리(해당 시장에 실제로 등록된 종목이 있는 idx만)
+const IDX_ORDER = ['sp500','ndx100','leverage','kospi'];
+function idxListFor(market){
+  return IDX_ORDER.filter(idx => FUNDS.some(f => f.market===market && f.idx===idx));
+}
+
+let state = { kr:'sp500', us:'sp500' };
+
+function buildChips(market){
+  const wrap = document.querySelector(`.filters[data-chips-for="${market}"]`);
+  const idxList = idxListFor(market);
+  wrap.innerHTML = idxList.map((idx,i)=>
+    `${i>0? '<span class="sep">·</span>' : ''}<button data-idx="${idx}" class="${idx===state[market]?'active':''}">${IDX_LABEL[idx]}</button>`
+  ).join('');
+  wrap.addEventListener('click', e=>{
+    const btn = e.target.closest('button'); if(!btn) return;
+    state[market] = btn.dataset.idx;
+    wrap.querySelectorAll('button').forEach(b=>b.classList.toggle('active', b===btn));
+    render(market);
+  });
+}
+
+function render(market){
+  const tbody = document.getElementById(`rows-${market}`);
+  const list = FUNDS.filter(f => f.market===market && f.idx===state[market])
+    .sort((a,b) => (parseAumToEok(b.aum) ?? -Infinity) - (parseAumToEok(a.aum) ?? -Infinity));
+  tbody.innerHTML = '';
+  if(list.length===0){
+    tbody.innerHTML = `<tr><td colspan="6" class="empty">아직 이 카테고리에 등록된 종목이 없어요.</td></tr>`;
+    return;
+  }
+  list.forEach((f,i)=>{
+    const row = document.createElement('tr');
+    row.className = 'row';
+    row.innerHTML = `
+      <td class="idxno">${String(i+1).padStart(2,'0')}</td>
+      <td>
+        ${f.market==='us' ? `
+        <div class="fname ticker-lead">${f.ticker}${f.leverage? `<span class="lev">${f.leverage}</span>`:''}${f._isTopAum? '<span class="stamp vol">순자산 1위</span>':''}</div>
+        <span class="ticker">${f.name} · ${f.issuer}</span>
+        ` : `
+        <div class="fname">${f.name}${f.leverage? `<span class="lev">${f.leverage}</span>`:''}${f._isTopAum? '<span class="stamp vol">순자산 1위</span>':''}</div>
+        <span class="ticker">${f.ticker} · ${f.issuer}</span>
+        `}
+      </td>
+      <td class="num fee-cell"><span class="fee-num">${fmtFee(f.fee)}</span> ${f._isBestFee? '<span class="stamp">최저보수</span>':''}</td>
+      <td class="num" style="color:var(--muted)">${f.listed}</td>
+      <td class="num">
+        <div>${f.price}</div>
+        <div class="div-line">
+          <span class="div-freq">배당 ${f.divFreq}</span>
+          <span class="div-yield">${f.divYield}</span>
+          ${f._isTopDiv? '<span class="stamp div">배당 1위</span>':''}
+        </div>
+      </td>
+      <td class="chev">▾</td>
+    `;
+    const detailRow = document.createElement('tr');
+    detailRow.className = 'detail-row closed';
+    detailRow.innerHTML = `
+      <td colspan="6">
+        <div class="detail-grid">
+          <div><div class="stat-label">지수</div><div class="stat-value">${IDX_LABEL[f.idx]}</div></div>
+          <div><div class="stat-label">순자산</div><div class="stat-value">${f.aum}</div></div>
+          <div><div class="stat-label">상장 시장</div><div class="stat-value">${MARKET_LABEL[f.market]==='KR'?'한국거래소':'미국(NYSE/NASDAQ)'}</div></div>
+        </div>
+        <div class="pc-grid">
+          <div class="pc-box pro"><h4>장점</h4><ul>${f.pros.map(p=>`<li>${p}</li>`).join('')}</ul></div>
+          <div class="pc-box con"><h4>단점</h4><ul>${f.cons.map(c=>`<li>${c}</li>`).join('')}</ul></div>
+        </div>
+        ${f.url? `<a class="site-link" href="${f.url}" target="_blank" rel="noopener noreferrer">운용사 공식 상품 페이지 열기 ↗</a>` : ''}
+      </td>
+    `;
+    row.addEventListener('click', ()=>{
+      const closed = detailRow.classList.contains('closed');
+      detailRow.classList.toggle('closed', !closed);
+      row.querySelector('.chev').textContent = closed ? '▴' : '▾';
+    });
+    tbody.appendChild(row);
+    tbody.appendChild(detailRow);
+  });
+}
+
+async function init(){
+  await loadLiveData();
+  computeBadges();
+  ['kr','us'].forEach(market=>{
+    buildChips(market);
+    render(market);
+  });
+}
+init();
+</script>
+</body>
+</html>
