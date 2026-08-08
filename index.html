@@ -316,6 +316,20 @@ const FUNDS = [
     cons:['QQQ보다 상장이 늦어 옵션시장·기관 유동성은 상대적으로 얕음','단기 트레이더에게는 QQQ가 스프레드 면에서 더 유리']
   },
   {
+    market:'us', idx:'ndx100', ticker:'QNDX', name:'SPDR Portfolio Nasdaq 100 ETF', issuer:'State Street',
+    fee:0.10, listed:'2026-06-23', price:'$24.30', aum:'$175.0M',
+    divFreq:'-', divYield:'-',
+    pros:['2026년 6월 상장, 나스닥100 ETF 중 최저 수준 총보수(0.10%)를 내세운 신상품','SPY를 운용하는 State Street의 저비용 포트폴리오 라인업 신규 진입'],
+    cons:['상장 1개월 남짓으로 트랙레코드·분배 이력이 아직 없음','순자산이 아직 매우 작아(약 $175M) 스프레드·괴리율 유의']
+  },
+  {
+    market:'us', idx:'ndx100', ticker:'IQQ', name:'iShares Nasdaq 100 ETF', issuer:'BlackRock',
+    fee:0.12, listed:'2026-07-08', price:'$24.27', aum:'$349.0M',
+    divFreq:'-', divYield:'-',
+    pros:['2026년 7월 상장, 세계 최대 ETF 운용사 iShares(BlackRock)의 나스닥100 신규 진입','QQQ 대비 낮은 보수를 내세운 최신 경쟁 상품'],
+    cons:['상장한 지 한 달이 채 안 돼 트랙레코드가 사실상 없음','순자산이 아직 매우 작아(약 $349M) 유동성 리스크 존재']
+  },
+  {
     market:'kr', idx:'kospi', ticker:'069500', isin:'KR7069500007', name:'KODEX 200', issuer:'삼성자산운용',
     fee:0.15, listed:'2002-10-14', price:'41,250원', aum:'324,598억원',
     divFreq:'분기', divYield:'0.64%',
@@ -411,9 +425,10 @@ function computeBadges(){
       const maxAum = Math.max(...withAum.map(x=>x.v));
       withAum.forEach(x=>{ if(x.v === maxAum) x.f._isTopAum = true; });
     }
-    if(list.length > 1){
-      const maxDiv = Math.max(...list.map(f=>parseFloat(f.divYield)));
-      list.forEach(f=>{ if(parseFloat(f.divYield) === maxDiv) f._isTopDiv = true; });
+    const withDiv = list.map(f=>({f, v:parseFloat(f.divYield)})).filter(x=>!isNaN(x.v));
+    if(withDiv.length > 1){
+      const maxDiv = Math.max(...withDiv.map(x=>x.v));
+      withDiv.forEach(x=>{ if(x.v === maxDiv) x.f._isTopDiv = true; });
     }
   });
 }

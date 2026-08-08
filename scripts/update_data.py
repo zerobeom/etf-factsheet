@@ -69,6 +69,8 @@ SOURCES = [
     {"key": "TQQQ", "url": "https://www.funetf.co.kr/usetf/product/view/FOUSA08MU7", "currency": "USD"},
     {"key": "QQQM", "url": "https://www.funetf.co.kr/usetf/product/view/F000015DO3", "currency": "USD"},
     {"key": "QLD", "url": "https://www.funetf.co.kr/usetf/product/view/FEUSA04AGC", "currency": "USD"},
+    {"key": "QNDX", "url": "https://www.funetf.co.kr/usetf/product/view/F000026ODM", "currency": "USD"},
+    {"key": "IQQ", "url": "https://www.funetf.co.kr/usetf/product/view/F000026KKP", "currency": "USD"},
     # 모든 종목 등록 완료 (2026-07-11 기준)
 ]
 
